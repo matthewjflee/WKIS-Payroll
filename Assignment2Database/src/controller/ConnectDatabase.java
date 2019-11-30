@@ -29,13 +29,13 @@ public class ConnectDatabase {
 		hasPermission();
 	}
 	
-	public boolean hasPermission() {
+	private boolean hasPermission() {
 		boolean permission = false;
 		
 		String sql = "{? = call CHECK_USER_PERMISSION_FN}";
 		
 		try {
-			Connection conn = setConnection();
+			Connection conn = getConnection();
 			cstmt = conn.prepareCall(sql);
 			cstmt.registerOutParameter(1, Types.VARCHAR);
 			cstmt.execute();
@@ -65,7 +65,7 @@ public class ConnectDatabase {
 
 	}
 	
-	private Connection setConnection() {
+	private Connection getConnection() {
 		
 			try {
 				Class.forName("oracle.jdbc.driver.OracleDriver");
