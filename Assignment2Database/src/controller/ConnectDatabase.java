@@ -26,10 +26,10 @@ public class ConnectDatabase {
 	
 	public ConnectDatabase() {
 		getUserCredentials();
-		hasPermission();
+		getConnection();
 	}
 	
-	private String hasPermission() {
+	public String hasPermission() {
 		String permission = null;
 		
 		String sql = "{? = call CHECK_USER_PERMISSION_FN}";
@@ -45,13 +45,6 @@ public class ConnectDatabase {
 			cstmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		
-		if(permission.equals("N")) {
-			JOptionPane.showMessageDialog(null, "You do not have permission to continue.");
-		}
-		else {
-			JOptionPane.showMessageDialog(null, "Everything looks good. Please continue.");
 		}
 		
 		return permission;
@@ -75,7 +68,7 @@ public class ConnectDatabase {
 			} catch (ClassNotFoundException | SQLException e) {
 				JOptionPane.showMessageDialog(null, "Invalid Username or Password! Please try again!");
 			}
-			
+			JOptionPane.showMessageDialog(null, "Successfully Connected");
 			return connection;
 	}
 	
