@@ -29,8 +29,8 @@ public class ConnectDatabase {
 		hasPermission();
 	}
 	
-	private boolean hasPermission() {
-		boolean permission = false;
+	private String hasPermission() {
+		String permission = null;
 		
 		String sql = "{? = call CHECK_USER_PERMISSION_FN}";
 		
@@ -39,13 +39,19 @@ public class ConnectDatabase {
 			cstmt = conn.prepareCall(sql);
 			cstmt.registerOutParameter(1, Types.VARCHAR);
 			cstmt.execute();
-			String permissionString = cstmt.getString(1);
-			System.out.println(permissionString);
+			permission = cstmt.getString(1);
 			
 			conn.close();
 			cstmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+		
+		if(permission.equals("N")) {
+			JOptionPane.showMessageDialog(null, "You do not have permission to continue.");
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Everything looks good. Please continue.");
 		}
 		
 		return permission;
@@ -54,12 +60,8 @@ public class ConnectDatabase {
 	private void getUserCredentials() {
 		Scanner keyboard = new Scanner(System.in);
 		
-		//ask user for username and password
-		System.out.print("Username: ");
-		username = keyboard.nextLine();
-		
-		System.out.print("Password: ");
-		password = keyboard.nextLine();
+		username = JOptionPane.showInputDialog("Username: ");
+		password = JOptionPane.showInputDialog("Password: ");
 		
 		keyboard.close();
 
