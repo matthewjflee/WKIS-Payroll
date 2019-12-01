@@ -12,6 +12,8 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
+import model.User;
+
 public class ConnectDatabase {
 	
 	private Connection conn;
@@ -28,6 +30,14 @@ public class ConnectDatabase {
 	public ConnectDatabase() {
 		getUserCredentials();
 		getConnection();
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public String getPassword() {
+		return password;
 	}
 	
 	public String hasPermission() {
@@ -56,6 +66,8 @@ public class ConnectDatabase {
 		
 		username = JOptionPane.showInputDialog("Username: ");
 		password = JOptionPane.showInputDialog("Password: ");
+		
+		User theUser = new User(username, password);
 		
 		keyboard.close();
 
