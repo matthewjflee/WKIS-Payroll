@@ -49,8 +49,13 @@ public class WKISGui extends JFrame {
 		
 		cb = new ConnectDatabase();
 		
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		closeGui();
 		this.setVisible(true);
+	}
+	
+	private void closeGui() {
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 	}
 	
 	private JPanel createWestPanel() {
@@ -106,6 +111,7 @@ public class WKISGui extends JFrame {
 			}
 			else {
 				JOptionPane.showMessageDialog(null, "Everything looks good. Please continue.");
+				btnCheck.setEnabled(false);
 			}
 		});
 		

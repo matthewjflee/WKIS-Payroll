@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 
 public class ConnectDatabase {
 	
+	private Connection conn;
 	private Connection connection;
 	private Statement smt;
 	private PreparedStatement pstmt;
@@ -35,7 +36,7 @@ public class ConnectDatabase {
 		String sql = "{? = call CHECK_USER_PERMISSION_FN}";
 		
 		try {
-			Connection conn = getConnection();
+			conn = getConnection();
 			cstmt = conn.prepareCall(sql);
 			cstmt.registerOutParameter(1, Types.VARCHAR);
 			cstmt.execute();
@@ -65,11 +66,22 @@ public class ConnectDatabase {
 			try {
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				connection = DriverManager.getConnection(DATABASE_URL, username, password);
+				JOptionPane.showMessageDialog(null, "Successfully Connected");
 			} catch (ClassNotFoundException | SQLException e) {
 				JOptionPane.showMessageDialog(null, "Invalid Username or Password! Please try again!");
+				System.exit(0);
 			}
-			JOptionPane.showMessageDialog(null, "Successfully Connected");
 			return connection;
+	}
+	
+	public void closeConnection() {
+		try {
+			connection.close();
+			JOptionPane.showMessageDialog(null, "Diconnected from the database.");
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, "Something went wrong closing the database connection.");
+			
+		}
 	}
 	
 
