@@ -1,5 +1,8 @@
 package controller;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -26,19 +29,94 @@ public class ConnectDatabase {
 	private String username;
 	private String password;
 	
+	private String txtFileLocation;
+	private String txtFileName;
+	private String ctrlFile;
+	private String path;
+	private String logFile;
+	private User user;
+	private int exitValue;
+	
 	
 	public ConnectDatabase() {
 		getUserCredentials();
 		getConnection();
+//		createControlFile();
+//		loadTable();
 	}
-	
-	public String getUsername() {
-		return username;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
+	    
+    public void createControlFile() {
+    	setTxtFileName();
+    	setPath();
+    	setLogFile();
+    	setCtrlFile();
+//    	setLogFile();
+    	
+    	try {
+			FileWriter fw = new FileWriter(path + "\\" + ctrlFile);
+			PrintWriter pw = new PrintWriter(fw);
+			
+			pw.println("LOAD DATA");
+			pw.println("INFILE " + "\'" + path + "\\" + txtFileName + "\'");
+			pw.println("REPLACE");
+			pw.println("INTO TABLE payroll_load");
+			pw.println("FIELDS TERMINATED BY \';\' OPTIONALLY ENCLOSED BY \'\"\'");
+			pw.println("TRAILING NULLCOLS");
+			pw.println("(payroll_date DATE \"Month dd, yyyy\",");
+			pw.println("employee_id,");
+			pw.println("amount,");
+			pw.println("status)");
+			
+			pw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    }
+
+    public int loadTable() {
+        String sqlldr = "sqlldr userid=" + username + "/" + password + " control="
+                        + path + "/" + ctrlFile + " log=" + path + "/" + logFile;
+        
+        	try {
+        		Runtime rt = Runtime.getRuntime();
+            	Process proc = rt.exec(sqlldr);
+				exitValue = proc.waitFor();
+			} catch (InterruptedException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	return exitValue;
+    }
+    
+
+    private void setTxtFileName() {
+    	txtFileName = JOptionPane.showInputDialog("Please enter the name of the delimited text file (please include .txt):");
+    }
+    
+    private void setPath() {
+    	path = JOptionPane.showInputDialog("Please enter location for the files to be stored:");
+    }
+    
+    private void setCtrlFile() {
+    	System.out.println(txtFileName);
+    	String[] textFileNameSplit = txtFileName.split("\\.");
+    	
+    	for(int i = 0; i < textFileNameSplit.length; i++) {
+    		System.out.println(textFileNameSplit[i]);
+    	}
+    	
+    	ctrlFile = textFileNameSplit[0] + ".ctl";
+    }
+    
+    private void setLogFile() {
+    	
+    	String[] textFileNameSplit = txtFileName.split("\\.");
+    	logFile = textFileNameSplit[0] + ".log";
+
+    }
 	
 	public String hasPermission() {
 		String permission = null;
@@ -67,8 +145,6 @@ public class ConnectDatabase {
 		username = JOptionPane.showInputDialog("Username: ");
 		password = JOptionPane.showInputDialog("Password: ");
 		
-		User theUser = new User(username, password);
-		
 		keyboard.close();
 
 	}
@@ -89,7 +165,7 @@ public class ConnectDatabase {
 	public void closeConnection() {
 		try {
 			connection.close();
-			JOptionPane.showMessageDialog(null, "Diconnected from the database.");
+			JOptionPane.showMessageDialog(null, "Disconnected from the database.");
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Something went wrong closing the database connection.");
 			

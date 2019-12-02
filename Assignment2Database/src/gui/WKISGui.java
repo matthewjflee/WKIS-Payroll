@@ -74,6 +74,9 @@ public class WKISGui extends JFrame {
 		JPanel southPanel = new JPanel();
 		
 		btnClose = new JButton("Close");
+		btnClose.addActionListener(e -> {
+			System.exit(0);
+		});
 		southPanel.add(btnClose);
 		
 		return southPanel;
@@ -117,6 +120,17 @@ public class WKISGui extends JFrame {
 		
 		lblStepTwo = new JLabel("Step 2: Process Delimited Text File");
 		btnProcess = new JButton("Process");
+		btnProcess.addActionListener(e -> {
+			cb.createControlFile();
+			int exitValue = cb.loadTable();
+			
+			if(exitValue == 0) {
+				JOptionPane.showMessageDialog(null, "Successfully loaded file into WKIS Database");
+				btnProcess.setEnabled(false);
+			}				
+			else
+				JOptionPane.showMessageDialog(null, "An error has occurred. Please check your file path.");
+		});
 		
 		lblStepThree = new JLabel("Step 3: Perform Month End");
 		btnPerform = new JButton("Perform");
