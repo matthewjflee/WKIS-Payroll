@@ -7,34 +7,26 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
-import model.User;
-
+//Connect user to the WKIS Database
 public class ConnectDatabase {
 	
 	private Connection conn;
 	private Connection connection;
-	private Statement smt;
-	private PreparedStatement pstmt;
 	private CallableStatement cstmt;
-	private ResultSet rs;
 	private final String DATABASE_URL = "jdbc:oracle:thin:@localhost:1521:XE";
 	private String username;
 	private String password;
 	
-	private String txtFileLocation;
 	private String txtFileName;
 	private String ctrlFile;
 	private String path;
 	private String logFile;
-	private User user;
 	private int exitValue;
 	
 	private String exportFilePath;
