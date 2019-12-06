@@ -10,10 +10,11 @@ import javax.swing.JOptionPane;
 
 import model.User;
 
+//File manager
 public class FileManager {
 	
 	
-	
+	//File Manager
 	public FileManager() {
 		
 	}

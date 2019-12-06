@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import controller.ConnectDatabase;
 
-
+//GUI
 public class WKISGui extends JFrame {
 
 	private static final long serialVersionUID = -8456621528234132136L;
@@ -53,28 +53,34 @@ public class WKISGui extends JFrame {
 		this.setVisible(true);
 	}
 	
+	//Close the GUI
 	private void closeGui() {
+		cb.closeConnection();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
 	
+	//Create west panel
 	private JPanel createWestPanel() {
 		JPanel westPanel = new JPanel();
 		westPanel.setBounds(100, 100, 50, 50);
 		return westPanel;
 	}
 
+	//Create east panel
 	private Component createEastPanel() {
 		JPanel eastPanel = new JPanel();
 		eastPanel.setBounds(100, 100, 200, 200);
 		return eastPanel;
 	}
 
+	//Create south panel
 	private Component createSouthPanel() {
 		JPanel southPanel = new JPanel();
 		
 		btnClose = new JButton("Close");
 		btnClose.addActionListener(e -> {
+			cb.closeConnection();
 			System.exit(0);
 		});
 		southPanel.add(btnClose);
@@ -82,6 +88,7 @@ public class WKISGui extends JFrame {
 		return southPanel;
 	}
 
+	//Create north panel
 	private Component createNorthPanel() {
 		JPanel northPanel = new JPanel();
 		JLabel title = new JLabel("WKIS Payroll");
@@ -90,6 +97,7 @@ public class WKISGui extends JFrame {
 		return northPanel;
 	}
 
+	//Create center panel
 	private JPanel createCenterPanel() {
 		JPanel centerPanel = new JPanel();
 		
@@ -99,6 +107,7 @@ public class WKISGui extends JFrame {
 		
 	}
 	
+	//Create grid layout in center panel
 	private JPanel centerPanelGrid() {
 		JPanel centerCenter = new JPanel();
 		centerCenter.setLayout(new GridLayout(6,2));
@@ -123,6 +132,7 @@ public class WKISGui extends JFrame {
 		btnProcess.addActionListener(e -> {
 			cb.createControlFile();
 			int exitValue = cb.loadTable();
+			System.out.println(exitValue);
 			
 			if(exitValue == 0) {
 				JOptionPane.showMessageDialog(null, "Successfully loaded file into WKIS Database");
@@ -134,9 +144,24 @@ public class WKISGui extends JFrame {
 		
 		lblStepThree = new JLabel("Step 3: Perform Month End");
 		btnPerform = new JButton("Perform");
+		btnPerform.addActionListener(e -> {
+			cb.performMonthEnd();
+			JOptionPane.showMessageDialog(null,  "Month end transactions completed.");
+			btnPerform.setEnabled(false);
+		});
 		
 		lblStepFour = new JLabel("Step 4: Export Data");
 		btnExport = new JButton("Export");
+		btnExport.addActionListener(e -> {
+			cb.getExportFileInfo();
+			boolean success = cb.createDirectory();
+			cb.createDelimitedFile();
+			if(success) {
+				JOptionPane.showMessageDialog(null,  "File created successfully");
+				btnExport.setEnabled(false);
+			} else
+				JOptionPane.showMessageDialog(null,  "An error has occurred creating the file.");
+		});
 
 		centerCenter.add(lblStepOne);
 		centerCenter.add(btnCheck);

@@ -37,20 +37,22 @@ public class ConnectDatabase {
 	private User user;
 	private int exitValue;
 	
+	private String exportFilePath;
+	private String delimitedFile;
+	private String aliasPath;
 	
+	//Connect database
 	public ConnectDatabase() {
 		getUserCredentials();
 		getConnection();
-//		createControlFile();
-//		loadTable();
 	}
 	    
+	///Create the control file
     public void createControlFile() {
     	setTxtFileName();
     	setPath();
     	setLogFile();
     	setCtrlFile();
-//    	setLogFile();
     	
     	try {
 			FileWriter fw = new FileWriter(path + "\\" + ctrlFile);
@@ -69,13 +71,13 @@ public class ConnectDatabase {
 			
 			pw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
     	
     }
 
+    //Load table from file with SQL Loader
     public int loadTable() {
         String sqlldr = "sqlldr userid=" + username + "/" + password + " control="
                         + path + "/" + ctrlFile + " log=" + path + "/" + logFile;
@@ -85,21 +87,23 @@ public class ConnectDatabase {
             	Process proc = rt.exec(sqlldr);
 				exitValue = proc.waitFor();
 			} catch (InterruptedException | IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         	return exitValue;
     }
     
 
+    //Set text file name
     private void setTxtFileName() {
-    	txtFileName = JOptionPane.showInputDialog("Please enter the name of the delimited text file (please include .txt):");
+    	txtFileName = JOptionPane.showInputDialog("Please enter filename of payroll file:");
     }
     
+    //Set path for the files
     private void setPath() {
-    	path = JOptionPane.showInputDialog("Please enter location for the files to be stored:");
+    	path = JOptionPane.showInputDialog("Please enter location for the files:");
     }
     
+    //Create the control file
     private void setCtrlFile() {
     	System.out.println(txtFileName);
     	String[] textFileNameSplit = txtFileName.split("\\.");
@@ -111,6 +115,7 @@ public class ConnectDatabase {
     	ctrlFile = textFileNameSplit[0] + ".ctl";
     }
     
+    //Create the log file
     private void setLogFile() {
     	
     	String[] textFileNameSplit = txtFileName.split("\\.");
@@ -118,6 +123,7 @@ public class ConnectDatabase {
 
     }
 	
+    //Check if the user has permissions
 	public String hasPermission() {
 		String permission = null;
 		
@@ -139,6 +145,54 @@ public class ConnectDatabase {
 		return permission;
 	}
 	
+	//User input for export file information
+	public void getExportFileInfo() {
+		this.exportFilePath = JOptionPane.showInputDialog("Directory file path: ");
+		this.exportFilePath = "\'" + this.exportFilePath + "\'";
+		System.out.println(this.exportFilePath);
+		this.delimitedFile = JOptionPane.showInputDialog("Exported file name: ");
+		this.aliasPath = JOptionPane.showInputDialog("File path alias: ").toUpperCase();
+		System.out.println(aliasPath);
+	}
+	
+	//Create the directory alias
+	public boolean createDirectory() {
+		String sql = "CREATE OR REPLACE DIRECTORY " + aliasPath +  " AS " + exportFilePath;
+		int rowsAffected = -3;
+		System.out.println(sql);
+		try {
+			conn = getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			System.out.println(aliasPath + "\t" + exportFilePath);
+			rowsAffected = ps.executeUpdate();
+			System.out.println(rowsAffected);
+			
+			ps.close();
+			conn.close();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return rowsAffected == 0;
+	}
+	
+	//Perform month end operations
+	public void performMonthEnd() {
+		String sql = "{CALL MONTH_END_SP}";
+		
+		try {
+			conn = getConnection();
+			cstmt = conn.prepareCall(sql);
+			cstmt.execute();
+
+			
+			conn.close();
+			cstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//Grab user credential input
 	private void getUserCredentials() {
 		Scanner keyboard = new Scanner(System.in);
 		
@@ -149,12 +203,30 @@ public class ConnectDatabase {
 
 	}
 	
+	//Create delimited file
+	public void createDelimitedFile() {
+		String sql = "{CALL WRITE_FILE_SP(?,?)}";
+		
+		try {
+			conn = getConnection();
+			cstmt = conn.prepareCall(sql);
+			cstmt.setString(1, aliasPath);
+			cstmt.setString(2, delimitedFile);
+			
+			cstmt.execute();
+			conn.close();
+			cstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//Get database connection
 	private Connection getConnection() {
 		
 			try {
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				connection = DriverManager.getConnection(DATABASE_URL, username, password);
-				JOptionPane.showMessageDialog(null, "Successfully Connected");
 			} catch (ClassNotFoundException | SQLException e) {
 				JOptionPane.showMessageDialog(null, "Invalid Username or Password! Please try again!");
 				System.exit(0);
@@ -162,10 +234,10 @@ public class ConnectDatabase {
 			return connection;
 	}
 	
+	//Close database connection
 	public void closeConnection() {
 		try {
 			connection.close();
-			JOptionPane.showMessageDialog(null, "Disconnected from the database.");
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Something went wrong closing the database connection.");
 			
