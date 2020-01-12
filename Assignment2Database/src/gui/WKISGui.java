@@ -19,22 +19,17 @@ public class WKISGui extends JFrame {
 	private static final long serialVersionUID = -8456621528234132136L;
 	private JLabel lblStepOne;
 	private JButton btnCheck;
-	
 	private JLabel lblStepTwo;
 	private JButton btnProcess;
-	
 	private JLabel lblStepThree;
 	private JButton btnPerform;
-	
 	private JLabel lblStepFour;
 	private JButton btnExport;
-	
 	private JButton btnClose;
-	
 	private Container content;
-	
 	private ConnectDatabase cb;
 	
+	//initialize gui
 	public WKISGui() {
 		super("Integration Assignment");
 		this.setBounds(100,100,600,250);
@@ -46,6 +41,10 @@ public class WKISGui extends JFrame {
 		content.add(createSouthPanel(), BorderLayout.SOUTH);
 		content.add(createEastPanel(), BorderLayout.EAST);
 		content.add(createWestPanel(), BorderLayout.WEST);
+		
+		btnProcess.setEnabled(false);
+		btnPerform.setEnabled(false);
+		btnExport.setEnabled(false);
 		
 		cb = new ConnectDatabase();
 		
@@ -124,6 +123,9 @@ public class WKISGui extends JFrame {
 			else {
 				JOptionPane.showMessageDialog(null, "Everything looks good. Please continue.");
 				btnCheck.setEnabled(false);
+				btnExport.setEnabled(true);
+				btnPerform.setEnabled(true);
+				btnProcess.setEnabled(true);
 			}
 		});
 		
@@ -132,7 +134,6 @@ public class WKISGui extends JFrame {
 		btnProcess.addActionListener(e -> {
 			cb.createControlFile();
 			int exitValue = cb.loadTable();
-			System.out.println(exitValue);
 			
 			if(exitValue == 0) {
 				JOptionPane.showMessageDialog(null, "Successfully loaded file into WKIS Database");
@@ -171,7 +172,6 @@ public class WKISGui extends JFrame {
 		centerCenter.add(btnPerform);
 		centerCenter.add(lblStepFour);
 		centerCenter.add(btnExport);
-		
 		
 		return centerCenter;
 	}
